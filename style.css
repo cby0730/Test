@@ -44,7 +44,7 @@ body {
 
 /* ===== Heart SVG Styling ===== */
 .heart {
-    width: 280px;
+    width: 300px;
     height: auto;
     filter: drop-shadow(0 10px 30px rgba(194, 56, 102, 0.3));
     transition: all 0.4s var(--transition-smooth);
@@ -82,8 +82,10 @@ body {
 }
 
 .message {
-    font-size: 32px;
-    font-weight: 600;
+    font-family: 'Great Vibes', cursive;
+    font-size: 48px;
+    font-weight: 400;
+    white-space: nowrap;
     color: var(--message-color);
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     opacity: 0;
@@ -177,11 +179,11 @@ body {
 /* Tablet */
 @media (max-width: 768px) {
     .heart {
-        width: 220px;
+        width: 240px;
     }
 
     .message {
-        font-size: 28px;
+        font-size: 36px;
     }
 
     .particle {
@@ -193,11 +195,11 @@ body {
 /* Mobile */
 @media (max-width: 480px) {
     .heart {
-        width: 180px;
+        width: 200px;
     }
 
     .message {
-        font-size: 24px;
+        font-size: 32px;
     }
 
     .particle {
@@ -209,11 +211,11 @@ body {
 /* Small Mobile */
 @media (max-width: 360px) {
     .heart {
-        width: 150px;
+        width: 160px;
     }
 
     .message {
-        font-size: 20px;
+        font-size: 24px;
     }
 }
 
@@ -233,5 +235,32 @@ body {
     :root {
         --bg-color: #1a1a1a;
         --text-color: #fafafa;
+    }
+}
+/* ===== Ripple Effect ===== */
+.ripple {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 107, 157, 0.4) 0%, rgba(255, 107, 157, 0) 70%);
+    z-index: 0;
+    pointer-events: none;
+    animation: rippleExpand 2s ease-out forwards;
+}
+
+@keyframes rippleExpand {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.8;
+    }
+    100% {
+        width: 250vmax;
+        height: 250vmax;
+        opacity: 0;
     }
 }

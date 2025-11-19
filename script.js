@@ -73,7 +73,7 @@ function animateParticles() {
 
         // Calculate random direction
         const angle = (Math.PI * 2 * i) / CONFIG.particleCount + (Math.random() - 0.5) * 0.5;
-        const distance = 100 + Math.random() * 100;
+        const distance = 200 + Math.random() * 300;
         const tx = Math.cos(angle) * distance;
         const ty = Math.sin(angle) * distance;
 
@@ -100,6 +100,18 @@ function showMessage() {
     }, CONFIG.messageDuration);
 }
 
+// ===== Create Ripple Effect =====
+function createRipple() {
+    const ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    document.body.appendChild(ripple);
+
+    // Remove ripple after animation
+    setTimeout(() => {
+        ripple.remove();
+    }, 2000); // Match animation duration
+}
+
 // ===== Handle Heart Click =====
 function handleHeartClick() {
     if (isAnimating) return;
@@ -111,6 +123,7 @@ function handleHeartClick() {
 
     // Trigger effects
     animateParticles();
+    createRipple();
     showMessage();
 
     // Remove animation class after animation completes
