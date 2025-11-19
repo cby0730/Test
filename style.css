@@ -1,0 +1,237 @@
+/* ===== CSS Variables ===== */
+:root {
+    --bg-color: #fafafa;
+    --heart-color-start: #ff6b9d;
+    --heart-color-end: #c23866;
+    --text-color: #333;
+    --glow-color: rgba(255, 107, 157, 0.6);
+    --message-color: #fff;
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== Global Reset & Base ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Container Layout ===== */
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* ===== Heart Wrapper ===== */
+.heart-wrapper {
+    position: relative;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== Heart SVG Styling ===== */
+.heart {
+    width: 280px;
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(194, 56, 102, 0.3));
+    transition: all 0.4s var(--transition-smooth);
+    animation: breathe 2.5s ease-in-out infinite;
+}
+
+.heart path {
+    fill: url(#heartGradient);
+}
+
+/* ===== Hover Effects ===== */
+.heart-wrapper:hover .heart {
+    filter: drop-shadow(0 15px 40px var(--glow-color));
+    transform: scale(1.05);
+    animation: none;
+}
+
+/* ===== Click/Active State ===== */
+.heart-wrapper:active .heart {
+    transform: scale(0.95);
+}
+
+.heart-wrapper.clicked .heart {
+    animation: pulse 0.6s var(--transition-smooth);
+}
+
+/* ===== Message Container ===== */
+.message-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.message {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--message-color);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.4s var(--transition-smooth);
+}
+
+.message.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ===== Particles Container ===== */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.particle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.particle svg {
+    width: 100%;
+    height: 100%;
+    fill: url(#heartGradient);
+}
+
+/* ===== Animations ===== */
+
+/* Breathing Animation */
+@keyframes breathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.03);
+    }
+}
+
+/* Pulse Animation (on click) */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.15);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    75% {
+        transform: scale(1.12);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Particle Float Animation */
+@keyframes particleFloat {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0.3) rotate(180deg);
+    }
+}
+
+/* ===== Responsive Design ===== */
+
+/* Tablet */
+@media (max-width: 768px) {
+    .heart {
+        width: 220px;
+    }
+
+    .message {
+        font-size: 28px;
+    }
+
+    .particle {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .heart {
+        width: 180px;
+    }
+
+    .message {
+        font-size: 24px;
+    }
+
+    .particle {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 360px) {
+    .heart {
+        width: 150px;
+    }
+
+    .message {
+        font-size: 20px;
+    }
+}
+
+/* ===== Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+
+    .heart,
+    .message,
+    .particle {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ===== Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #fafafa;
+    }
+}
