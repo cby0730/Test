@@ -237,6 +237,7 @@ body {
         --text-color: #fafafa;
     }
 }
+
 /* ===== Ripple Effect ===== */
 .ripple {
     position: fixed;
@@ -258,9 +259,200 @@ body {
         height: 0;
         opacity: 0.8;
     }
+
     100% {
         width: 250vmax;
         height: 250vmax;
         opacity: 0;
+    }
+}
+
+/* ===== Small Hearts Container ===== */
+.small-hearts-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.small-heart {
+    position: absolute;
+    width: 40px;
+    height: auto;
+    cursor: pointer;
+    pointer-events: auto;
+    filter: drop-shadow(0 4px 12px rgba(194, 56, 102, 0.3));
+    animation: smallHeartBreathe 2s ease-in-out infinite;
+    transition: all 0.3s var(--transition-smooth);
+    opacity: 1;
+}
+
+.small-heart:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 6px 16px rgba(194, 56, 102, 0.5));
+}
+
+.small-heart svg {
+    width: 100%;
+    height: 100%;
+}
+
+.small-heart path {
+    fill: url(#heartGradient);
+}
+
+/* Small heart breathing animation */
+@keyframes smallHeartBreathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Gathering animation with trail */
+@keyframes gatherToCenter {
+    0% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(var(--gather-x), var(--gather-y)) scale(0.3);
+    }
+}
+
+/* Trail effect for gathering */
+.small-heart.gathering {
+    animation: none;
+    filter: drop-shadow(0 0 20px rgba(255, 107, 157, 0.8));
+}
+
+.small-heart.gathering::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 107, 157, 0.6) 0%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: trailPulse 0.5s ease-out infinite;
+}
+
+@keyframes trailPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 0.3;
+    }
+}
+
+/* ===== Hint Container ===== */
+.hint-container {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    pointer-events: none;
+}
+
+.hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--heart-color-start);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px 24px;
+    border-radius: 30px;
+    box-shadow: 0 4px 20px rgba(194, 56, 102, 0.2);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s var(--transition-smooth);
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.hint.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Dark mode hint styling */
+@media (prefers-color-scheme: dark) {
+    .hint {
+        background: rgba(42, 42, 42, 0.95);
+        color: var(--heart-color-start);
+        box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+    }
+}
+
+/* ===== Stage-based Visibility ===== */
+/* Stage 0: Scattered small hearts */
+.stage-0 .heart-wrapper {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5);
+}
+
+.stage-0 .small-hearts-container {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Stage 1: Big heart visible */
+.stage-1 .heart-wrapper {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+.stage-1 .small-hearts-container {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Stage 2: Explosion effects */
+.stage-2 .heart-wrapper {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ===== Responsive Hints ===== */
+@media (max-width: 480px) {
+    .hint {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+    .hint-container {
+        bottom: 40px;
+    }
+}
+
+@media (max-width: 360px) {
+    .hint {
+        font-size: 14px;
+        padding: 8px 16px;
     }
 }
