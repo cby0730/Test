@@ -17,12 +17,59 @@ const CONFIG = {
     hints: {
         stage0: '點擊匯聚愛心 ❤️',
         stage1: '再點一次看魔法 ✨',
-        stage2: '點擊重新開始 🔄'
-    }
+        stage2: '點擊查看我們的時光 ⏰',
+        stage3: '點擊愛心查看回憶 💕'
+    },
+
+    // V4: Timeline configuration
+    currentVersionIndex: 0, // V4 is the first timeline point (index 0)
+    timelineData: [
+        {
+            version: 'V4',
+            date: new Date('2020-12-19'),
+            title: '在一起',
+            description: '',
+            image: 'photos/1.jpg'
+        },
+        {
+            version: '敬請期待',  // 保持禁用狀態
+            date: new Date('2021-02-12'),
+            title: '一起的手環',
+            description: '',
+            image: 'photos/2.jpg'
+        },
+        {
+            version: '敬請期待',
+            date: new Date('2025-12-15'), // 預留
+            title: '第三個時刻',
+            description: '未來的回憶',
+            image: 'photos/3.jpg'
+        },
+        {
+            version: '敬請期待',
+            date: new Date('2026-01-01'), // 預留
+            title: '第四個時刻',
+            description: '未來的回憶',
+            image: 'photos/4.jpg'
+        },
+        {
+            version: '敬請期待',
+            date: new Date('2026-01-15'), // 預留
+            title: '第五個時刻',
+            description: '未來的回憶',
+            image: 'photos/5.jpg'
+        }
+    ]
 };
 
+// ===== Helper: Format Date =====
+function formatDate(date) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+}
+
 // ===== State Management =====
-let currentStage = 0; // 0: scattered, 1: gathered, 2: exploded
+let currentStage = 0; // 0: scattered, 1: gathered, 2: exploded, 3: timeline
 let isAnimating = false;
 let smallHearts = [];
 
@@ -34,6 +81,12 @@ const message = document.querySelector('.message');
 const particlesContainer = document.querySelector('.particles-container');
 const smallHeartsContainer = document.querySelector('.small-hearts-container');
 const hintElement = document.querySelector('.hint');
+
+// V4: Timeline elements
+const timelineContainer = document.querySelector('.timeline-container');
+const timelinePoints = document.querySelector('.timeline-points');
+const infoModal = document.querySelector('.info-modal');
+const infoClose = document.querySelector('.info-close');
 
 // ===== Heart SVG Path =====
 const heartPath = 'M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z';
@@ -273,6 +326,181 @@ function resetToScattered() {
     }, 400);
 }
 
+// ===== V4: Enter Timeline Mode (Stage 2 → Stage 3) =====
+function enterTimeline() {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    // Calculate target position for the heart based on current version
+    const targetIndex = CONFIG.currentVersionIndex;
+    const timelineHeight = window.innerHeight * 0.7; // 70vh
+    const timelineTop = (window.innerHeight - timelineHeight) / 2;
+    const pointCount = CONFIG.timelineData.length;
+
+    // Calculate Y position for this version's timeline point
+    // Timeline points are positioned with top, and vertically centered with transform
+    const pointY = timelineTop + (timelineHeight / (pointCount - 1)) * targetIndex;
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    // Calculate movement delta (no X movement since we stay centered)
+    const deltaX = 0;
+    const deltaY = pointY - centerY;
+
+    // Animate big heart: shrink and move to timeline position
+    // Timeline point width is 50px, so scale to match: 50/300 ≈ 0.167
+    heartWrapper.style.transition = 'all 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+    heartWrapper.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.167)`;
+
+    // After heart animation, hide heart and show timeline
+    setTimeout(() => {
+        // Hide the moved heart to avoid overlap with timeline point
+        heartWrapper.style.opacity = '0';
+
+        generateTimelinePoints();
+        timelineContainer.classList.add('show');
+        currentStage = 3;
+        updateStage();
+        isAnimating = false;
+    }, 1000);
+}
+
+// ===== V4: Generate Timeline Points =====
+function generateTimelinePoints() {
+    timelinePoints.innerHTML = '';
+
+    const timelineHeight = window.innerHeight * 0.7; // Match CSS 70vh
+    const pointCount = CONFIG.timelineData.length;
+
+    CONFIG.timelineData.forEach((data, index) => {
+        // Calculate vertical position (evenly distributed)
+        const y = (timelineHeight / (pointCount - 1)) * index;
+
+        // Determine if this point should be on left or right (alternating)
+        const isLeft = index % 2 === 1;
+
+        // Create timeline point
+        const point = createTimelinePoint(data, y, isLeft, index);
+        timelinePoints.appendChild(point);
+    });
+}
+
+// ===== V4: Create Timeline Point Element =====
+function createTimelinePoint(data, y, isLeft, index) {
+    const pointDiv = document.createElement('div');
+    pointDiv.className = 'timeline-point';
+    if (isLeft) {
+        pointDiv.classList.add('left');
+    }
+    pointDiv.style.top = `${y}px`;
+
+    // Create heart SVG
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 32 29.6');
+
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+    gradient.setAttribute('id', `timelineGradient-${index}`);
+    gradient.setAttribute('x1', '0%');
+    gradient.setAttribute('y1', '0%');
+    gradient.setAttribute('x2', '100%');
+    gradient.setAttribute('y2', '100%');
+
+    const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('style', 'stop-color:#ff6b9d;stop-opacity:1');
+
+    const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop2.setAttribute('offset', '100%');
+    stop2.setAttribute('style', 'stop-color:#c23866;stop-opacity:1');
+
+    gradient.appendChild(stop1);
+    gradient.appendChild(stop2);
+    defs.appendChild(gradient);
+    svg.appendChild(defs);
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', heartPath);
+    path.setAttribute('fill', `url(#timelineGradient-${index})`);
+
+    svg.appendChild(path);
+    pointDiv.appendChild(svg);
+
+    // Create label (for first point show date, others show version)
+    const label = document.createElement('div');
+    label.className = 'timeline-label';
+    if (index === 0) {
+        // First point: show formatted date
+        label.textContent = formatDate(data.date);
+    } else {
+        // Other points: show version name
+        label.textContent = data.version;
+    }
+    pointDiv.appendChild(label);
+
+    // Only first point is clickable, others are disabled
+    if (index === 0) {
+        // Click event: show info modal (only for first point)
+        pointDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showInfoModal(data);
+        });
+    } else {
+        // Disable other points (coming soon)
+        pointDiv.classList.add('disabled');
+    }
+
+    return pointDiv;
+}
+
+// ===== V4: Show Info Modal =====
+function showInfoModal(data) {
+    const image = infoModal.querySelector('.info-image');
+    const title = infoModal.querySelector('.info-title');
+    const date = infoModal.querySelector('.info-date');
+    const description = infoModal.querySelector('.info-description');
+
+    // Fill data
+    image.src = data.image;
+    image.alt = data.title;
+    title.textContent = data.title;
+    date.textContent = formatDate(data.date);
+    description.textContent = data.description;
+
+    // Show modal
+    infoModal.classList.add('show');
+}
+
+// ===== V4: Close Info Modal =====
+function closeInfoModal() {
+    infoModal.classList.remove('show');
+}
+
+// ===== V4: Reset from Timeline (Stage 3 → Stage 0) =====
+function resetFromTimeline() {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    // Hide timeline
+    timelineContainer.classList.remove('show');
+
+    // Reset big heart position and scale
+    heartWrapper.style.transition = 'all 0.8s ease';
+    heartWrapper.style.transform = '';
+    heartWrapper.style.opacity = '0';
+
+    setTimeout(() => {
+        currentStage = 0;
+        updateStage();
+        initializeSmallHearts();
+
+        // Reset heart styles
+        heartWrapper.style.opacity = '';
+
+        isAnimating = false;
+    }, 800);
+}
+
 // ===== Update Stage (UI and hints) =====
 function updateStage() {
     // Update container class
@@ -291,13 +519,18 @@ function updateStage() {
         case 2:
             hintText = CONFIG.hints.stage2;
             break;
+        case 3:
+            hintText = CONFIG.hints.stage3;
+            break;
     }
 
     // Fade out, change text, fade in
     hintElement.classList.remove('show');
     setTimeout(() => {
         hintElement.textContent = hintText;
-        hintElement.classList.add('show');
+        if (currentStage !== 3) {
+            hintElement.classList.add('show');
+        }
     }, 200);
 }
 
@@ -316,8 +549,12 @@ function handleClick(e) {
             explodeHearts();
             break;
         case 2:
-            // Stage 2: Reset to scattered
-            resetToScattered();
+            // Stage 2: Enter timeline
+            enterTimeline();
+            break;
+        case 3:
+            // Stage 3: Reset from timeline
+            resetFromTimeline();
             break;
     }
 }
@@ -352,6 +589,24 @@ heartWrapper.addEventListener('touchstart', (e) => {
     }
 }, { passive: false });
 
+// ===== V4: Timeline Event Listeners =====
+// Close info modal
+infoClose.addEventListener('click', closeInfoModal);
+
+// Click modal background to close
+infoModal.addEventListener('click', (e) => {
+    if (e.target === infoModal) {
+        closeInfoModal();
+    }
+});
+
+// Click timeline background to reset (Stage 3)
+timelineContainer.addEventListener('click', (e) => {
+    if (e.target === timelineContainer && currentStage === 3) {
+        resetFromTimeline();
+    }
+});
+
 // ===== Keyboard Accessibility =====
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -379,5 +634,6 @@ function init() {
 init();
 
 // ===== Console Easter Egg =====
-console.log('%c❤️ Made with love - V3 Edition', 'color: #ff6b9d; font-size: 20px; font-weight: bold;');
-console.log('%cThree stages of love: Scattered → Gathered → Eternal 💝', 'color: #c23866; font-size: 14px;');
+console.log('%c❤️ Made with love - V4 Edition', 'color: #ff6b9d; font-size: 20px; font-weight: bold;');
+console.log('%cFour stages of love: Scattered → Gathered → Exploded → Timeline 💕', 'color: #c23866; font-size: 14px;');
+

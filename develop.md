@@ -29,6 +29,7 @@ ForMyLove/
 | V1 | `47448ab` | 2025-11-19 | 基礎愛心互動、呼吸動畫 |
 | V2 | `v2` / `main` | 2025-11-19 | 粒子爆炸、訊息顯示、漣漪效果 |
 | V3 | `v3` | 2025-11-21 | 三階段互動、匯聚動畫、循環體驗 |
+| V4 | `v4` | 2025-11-25 | 垂直時間軸、回憶展示、版本管理 ⭐ 最新版本 |
 
 ---
 
@@ -50,7 +51,8 @@ ForMyLove/
 
 ---
 
-## 🌟 V3 版本（三階段互動）⭐ 最新版本
+## 🌟 V3 版本（三階段互動）
+
 
 ### 核心功能
 
@@ -157,6 +159,178 @@ smallHearts.forEach((smallHeart, index) => {
 - 💬 動態提示系統（用戶引導）
 - 🔄 無限循環體驗（永不結束的愛）
 - 📱 完整響應式支援（所有裝置）
+
+
+---
+
+## 🎯 V4 版本（時間軸模式）⭐ 最新版本
+
+### 核心功能
+
+#### 四階段互動系統
+1. **階段 0 - 散布 (Scattered)**
+   - 12 個小愛心隨機散布全螢幕
+   - 每個小愛心獨立呼吸動畫（2 秒循環）
+   - 提示文字：「點擊匯聚愛心 ❤️」
+
+2. **階段 1 - 匯聚 (Gathering)**
+   - 點擊觸發 1 秒匯聚動畫
+   - 波浪效果：每個小愛心延遲 30ms 啟動
+   - 拖尾光暈：徑向漸層 + 脈衝動畫
+   - 提示文字：「再點一次看魔法 ✨」
+
+3. **階段 2 - 爆炸 (Explosion)**
+   - 12 個粒子向四周飛散
+   - 背景漣漪擴散效果
+   - "I love You" 訊息淡入淡出
+   - 提示文字：「點擊查看我們的時光 ⏰」
+
+4. **階段 3 -時間軸 (Timeline)** ⭐ **V4 新增**
+   - 大愛心縮小並移動到第一個時間點（1.2秒動畫）
+   - 垂直時間軸淡入顯示（0.8秒）
+   - 5個時間點：可點擊查看回憶
+   - 提示文字：「點擊愛心查看回憶 💕」
+
+5. **循環重置**
+   - 點擊時間軸背景重置回階段 0
+
+### 新增元素
+
+#### HTML 結構擴充
+```html
+<!-- 時間軸容器 -->
+<div class="timeline-container">
+    <div class="timeline-line"></div>
+    <div class="timeline-points"></div>
+</div>
+
+<!-- 資訊對話框 -->
+<div class="info-modal">
+    <div class="info-content">
+        <button class="info-close">×</button>
+        <div class="info-image-container">
+            <img src="" class="info-image">
+        </div>
+        <div class="info-details">
+            <h3 class="info-title"></h3>
+            <p class="info-date"></p>
+            <p class="info-description"></p>
+        </div>
+    </div>
+</div>
+```
+
+#### CSS 新增樣式（+327 行）
+- `.timeline-container` - 垂直時間軸容器（70vh）
+- `.timeline-line` - 時間軸線條（粉色漸層）
+- `.timeline-point` - 時間點愛心（50px，垂直居中）
+- `.timeline-point.disabled` - 禁用狀態（透明度0.4）
+- `.timeline-label` - 時間點標籤（左右交錯）
+- `.info-modal` - 毛玻璃對話框
+- `.info-content` - 對話框內容（照片+資訊）
+- 響應式支援（桌面/平板/手機）
+
+#### JavaScript 新增邏輯（+179 行）
+- `CONFIG.timelineData` - 時間點資料配置
+- `formatDate()` - 日期格式化（"Nov 19, 2025"）
+- `enterTimeline()` - 進入時間軸模式
+- `generateTimelinePoints()` - 動態生成時間點
+- `createTimelinePoint()` - 建立時間點元素（含禁用邏輯）
+- `showInfoModal()` / `closeInfoModal()` - 對話框控制
+- `resetFromTimeline()` - 從時間軸重置
+
+### 時間軸功能
+
+#### 時間點配置
+```javascript
+timelineData: [
+    {
+        version: 'V4',
+        date: new Date('2020-12-19'),
+        title: '在一起',
+        description: '',
+        image: 'photos/1.jpg'
+    },
+    {
+        version: '敬請期待',  // 禁用狀態
+        date: new Date('2021-02-12'),
+        title: '一起的手環',
+        description: '',
+        image: 'photos/2.jpg'
+    },
+    // ... 共5個時間點
+]
+```
+
+#### 啟用/禁用機制
+- **啟用時間點**：`index === 0` 或將 `version` 改為非「敬請期待」
+- **禁用時間點**：`version: '敬請期待'` + `.disabled` class
+- **視覺效果**：透明度 40%、無 hover 效果、`cursor: not-allowed`
+
+### 技術亮點
+
+#### 1. 精確對齊動畫
+```javascript
+// 大愛心縮小至50px（timeline-point尺寸）
+const scale = 50 / 300; // 0.167
+heartWrapper.style.transform = `translate(0, ${deltaY}px) scale(${scale})`;
+
+// 時間點垂直居中對齊線條
+.timeline-point {
+    transform: translate(-50%, -50%);  // 水平+垂直居中
+}
+```
+
+#### 2. 日期格式化
+```javascript
+function formatDate(date) {
+    const months = ['Jan', 'Feb', 'Mar', ...];
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+}
+// 輸出: "Dec 19, 2020"
+```
+
+#### 3. 條件式渲染
+```javascript
+// 第一個時間點顯示日期，其他顯示版本名
+if (index === 0) {
+    label.textContent = formatDate(data.date);
+} else {
+    label.textContent = data.version;  // "敬請期待"
+}
+```
+
+#### 4. 毛玻璃效果
+```css
+.info-content {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+```
+
+### 設計特色
+- 📅 **垂直時間軸** - 時間向下流動，5個時間點均勻分布
+- 🏷️ **左右交錯標籤** - 視覺平衡，易於閱讀
+- 💬 **毛玻璃對話框** - 現代美學，半透明背景
+- 🔒 **禁用狀態管理** - 清晰區分已開放/未開放時間點
+- 🎨 **精確動畫** - 大愛心完美對齊第一個時間點
+- 📱 **完整響應式** - 桌面/平板/手機完美適配
+
+### 重要更新記錄
+
+#### 2025-11-25 更新
+1. **修正重疊問題** - 大愛心移動後自動隱藏（`opacity: 0`）
+2. **修正標籤顯示** - V5-V8 改為「敬請期待」
+3. **修正對齊問題** - 時間點使用 `translate(-50%, -50%)` 垂直居中
+4. **更新第一個時間點** - 日期改為 2020-12-19，標籤顯示日期
+5. **實作禁用機制** - 後四個時間點不可點擊（`.disabled`）
+6. **準備第二時間點** - 日期 2021-02-12，標題「一起的手環」
+
+### 當前狀態
+- ✅ **已開放**：時間點 1（2020-12-19 - 在一起）
+- 🔒 **已準備**：時間點 2（2021-02-12 - 一起的手環）
+- 🔒 **預留**：時間點 3、4、5
 
 
 ---
