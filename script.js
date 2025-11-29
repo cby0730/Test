@@ -21,8 +21,8 @@ const CONFIG = {
         stage3: '點擊愛心查看回憶 💕'
     },
 
-    // V4: Timeline configuration
-    currentVersionIndex: 0, // V4 is the first timeline point (index 0)
+    // V5: Timeline configuration
+    currentVersionIndex: 1, // V5 is the second timeline point (index 1)
     timelineData: [
         {
             version: 'V4',
@@ -32,7 +32,7 @@ const CONFIG = {
             image: 'photos/1.jpg'
         },
         {
-            version: '敬請期待',  // 保持禁用狀態
+            version: 'V5',  // 開放此時間點
             date: new Date('2021-02-12'),
             title: '一起的手環',
             description: '',
@@ -426,27 +426,24 @@ function createTimelinePoint(data, y, isLeft, index) {
     svg.appendChild(path);
     pointDiv.appendChild(svg);
 
-    // Create label (for first point show date, others show version)
+    // Determine if this point is enabled
+    const isEnabled = data.version !== '敬請期待';
+
+    // Create label: enabled points show date, disabled show "敬請期待"
     const label = document.createElement('div');
     label.className = 'timeline-label';
-    if (index === 0) {
-        // First point: show formatted date
-        label.textContent = formatDate(data.date);
-    } else {
-        // Other points: show version name
-        label.textContent = data.version;
-    }
+    label.textContent = isEnabled ? formatDate(data.date) : data.version;
     pointDiv.appendChild(label);
 
-    // Only first point is clickable, others are disabled
-    if (index === 0) {
-        // Click event: show info modal (only for first point)
+    // Add interactivity based on enabled state
+    if (isEnabled) {
+        // Enabled point: add click event
         pointDiv.addEventListener('click', (e) => {
             e.stopPropagation();
             showInfoModal(data);
         });
     } else {
-        // Disable other points (coming soon)
+        // Disabled point: add disabled class
         pointDiv.classList.add('disabled');
     }
 
