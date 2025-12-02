@@ -21,8 +21,8 @@ const CONFIG = {
         stage3: '點擊愛心查看回憶 💕'
     },
 
-    // V5: Timeline configuration
-    currentVersionIndex: 1, // V5 is the second timeline point (index 1)
+    // V6: Timeline configuration
+    currentVersionIndex: 2, // V6 is the third timeline point (index 2)
     timelineData: [
         {
             version: 'V4',
@@ -39,10 +39,10 @@ const CONFIG = {
             image: 'photos/2.jpg'
         },
         {
-            version: '敬請期待',
-            date: new Date('2025-12-15'), // 預留
-            title: '第三個時刻',
-            description: '未來的回憶',
+            version: 'V6',  // 開放此時間點
+            date: new Date('2022-09-24'),
+            title: '住再一起',
+            description: '',
             image: 'photos/3.jpg'
         },
         {
